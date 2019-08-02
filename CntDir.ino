@@ -1,126 +1,193 @@
+// cont_ dir _sonar_ esq
+void em_pista_virar_dir_h_obst(void) 		// 432"10"  
+{// com (FOTO2CC<FOTO2_CC_w_black) LED2CC já no negro
+  digitalWrite(StartLed,LOW);
+  delay(100);
+  rodar_1_4_dir();
 
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//  sonar esq
-//	      contornar dir  com  sonar esq
-// sonar esq
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++EmFrenteContornarContornar
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Parar();
+
+  delay(15);
+  digitalWrite(StartLed,HIGH);
+  saida_de_90();
+}
+
+
 void retomar_pista_a_direita(void)
 {
-  EmFrente();
+  delay(20);
   do
   {
+
     Leitura_Inf();
-  }while((FOTO4_EE > FOTO4_EE_w_black) || (FOTO2_CC > FOTO2_CC_w_black) || (FOTO0_DD > FOTO0_DD_w_black)) ;
-  Parar();
-  delay(500);
-  
-  Rodar_Dir();
+    if ((FOTO4_EE>FOTO4_EE_w_black) || (FOTO0_DD>FOTO0_DD_w_black))
+    {
+      recuar_2cm();
+      em_pista_virar_dir_h_obst();
+      break;
+    }
+    Leitura_Inf();
+  }while (FOTO2_CC>FOTO2_CC_w_black);
+}
+
+
+void em_frente_5cm_obst_cont_dir_sonar_esq(void) // contornar pela direita
+{	//:: ao rodar, o obstaculo ficou fora do sensor DIR??
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  EmFrente();
+  do		// segue ainda sem o obstaculo.				
+  {
+
+    delay(30);	
+    Dist_Esq();
+  } while (DistEsq>30);
+  delay(100);
+  EmFrente();	// segue ainda sem  o obstaculo ?
+  do	
+  {
+
+    delay(30);	
+    Dist_Esq();
+  }while (DistEsq>30);
+  delay(10);
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  EmFrente();
+  do	//segue com o obstaculo ja frente ao sensor ESQ
+  {
+
+    delay(30);	
+    Dist_Esq();
+  }while (DistEsq<30);
+  delay(50);
+  EmFrente();	//verificar se o obstaculo frente ao sensor ESQ ainda esta presente
   do
   {
-    Leitura4_EE();
-  }while(FOTO4_EE > FOTO4_EE_black);
 
+    delay(30);    
+    Dist_Esq();
+  }while (DistEsq<30);
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  //.... JA PASSOU ??
+  em_frente_5cm(); 
   Parar();
-  entrada_em_pista();
-//  paragem();
+  delay(100);
 }
 
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ..........................com sonar esq
-void em_frente_5cm_obst_cont_dir_sonar_esq(void)  // contornar pela direita
-{	// ao rodar, o obstaculo ficou fora do sensor ESQ??
-  EmFrente();
-  delay(400);  // (+/-) 15 cm: construir 
-  Dist_Esq();
-  if (DistEsq<40)
-  {
-    EmFrente();  Leitura1_CD();
-    do	//segue com o obstaculo frente ao sensor ESQ
-    {
-      delay(20);	
-      Dist_Esq();
-    }while (DistEsq<40);
-  
-    delay(10);
-    EmFrente();
-    
-    do	//segue com o obstaculo frente ao sensor ESQ
-    {
-      delay(20);	
-      Dist_Esq();
-    }   while (DistEsq<40);
-  }
-              
-  EmFrente();
-  delay(300);  //  em_frente_10cm();
-  Parar();
-  delay(500);
-}
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// sonar esq
-void em_frente_30cm_obst_cont_dir_sonar_esq(void) // contornar pela esquerda
-{
-  Dist_Esq();
-  EmFrente();  
-  if (DistEsq > 40)
-  { 
+
+
+void em_frente_30cm_obst_cont_dir_sonar_esq(void)
+{ 	// contornar pela direita
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  em_frente_5cm();
+  if (em_pista_fim_contornar==0)  
+  {	// ** PISTA EM FRENTE/ANTES DO OBSTACULO ???? ** 
+    EmFrente ();
     do
     {
-      delay(20);	
-      Dist_Esq();
-    }while (DistEsq > 40);
-  
+      Leitura2_CC();
+      if (FOTO2_CC < FOTO2_CC_black) 
+      {
+        delay(1);	
+        Leitura2_CC();
+        if (FOTO2_CC < FOTO2_CC_black) 
+        {
+          em_pista_virar_dir_h_obst();
+          em_pista_fim_contornar=1;	// obstaculo colocado em L
+          break;
+        }
+      }
+
+      delay(30);	Dist_Esq();
+    }while (DistEsq >20);
+  }
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  delay(100);  // .............. obstaculo a esquerda
+
+  if (em_pista_fim_contornar==0)
+  {
     do
     {
-      delay(20);	
-      Dist_Esq();
-    }while (DistEsq > 40);
+      Leitura2_CC();
+      if (FOTO2_CC < FOTO2_CC_black) 
+      {
+        delay(1);
+        Leitura2_CC();
+        if (FOTO2_CC < FOTO2_CC_black) 
+        {
+          em_pista_virar_dir_h_obst();
+          em_pista_fim_contornar=1;	// obstaculo colocado em L
+          break;
+        }
+      }
+
+      delay(30);	Dist_Esq();
+    }while (DistEsq <30);
   }
-  
-  do
-  {
-    delay(20);	
-    Dist_Esq();
-  }while (DistEsq < 40);
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+  if (em_pista_fim_contornar==0)  // verificar se obstaculo ainda a esquerda
+  {
+    do
+    {
+      Leitura2_CC();
+      if (FOTO2_CC < FOTO2_CC_black) 
+      {
+        delay(1);
+        Leitura2_CC();
+        if (FOTO2_CC < FOTO2_CC_black) 
+        {
+          em_pista_virar_dir_h_obst();
+          em_pista_fim_contornar=1;	// obstaculo colocado em L
+          break;
+        }
+      }
+
+      delay(30);	Dist_Esq();
+    }while (DistEsq <30);
+  }
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Parar();
+  delay(100);
+  Recuar();  // verificar apos teste se necessario
   do
   {
-    delay(20);	
-    Dist_Esq();
-  }while (DistEsq < 40);
-    
-  EmFrente();
-  delay(150);  //  //.... JA PASSOU
-  Parar();
-  delay(500);  
+    delay(30);	Dist_Esq();
+  }   while (DistEsq > 20);
+  delay(200);
+  // +++++++++++++// ja passou o obstaculo	
+  //	teste_passagem();
 }
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++// sonar esq
-
-void contornar_pela_dir_sonar_esq(void) 
+void contornar_pela_dir_sonar_esq(void)
 {
-  Parar();
-  delay(500);
-  
+  em_pista_fim_contornar=0;
+/*  ><><><><><><><><><><><><><><><><><><><><><><><>< */
   rodar_1_4_dir();
-//  paragem();
-
-  em_frente_5cm_obst_cont_dir_sonar_esq(); 
-// paragem();
-
+  //paragem();
+/*  ><><><><><><><><><><><><><><><><><><><><><><><>< */
+  em_frente_5cm_obst_cont_dir_sonar_esq();
+  // em_frente_5cm(); ????
+  //paragem();
+/*  ><><><><><><><><><><><><><><><><><><><><><><><>< */
   rodar_1_4_esq();
-// Paragem();
- 
-  em_frente_30cm_obst_cont_dir_sonar_esq();  //  1 vez
-// Paragem();
 
-  rodar_1_4_esq();
-// Paragem();
+/*  ><><><><><><><><><><><><><><><><><><><><><><><>< */
+  em_frente_30cm_obst_cont_dir_sonar_esq();
+  //  em_frente_5cm(); ????
+/*  ><><><><><><><><><><><><><><><><><><><><><><><>< */
+  if (em_pista_fim_contornar==0)
+  {
+    rodar_1_4_esq();
 
-  retomar_pista_a_esquerda();
-//  paragem();
+    /*  ><><><><><><><><><><><><><><><><><><><><><>< */  
+    em_frente_30cm_obst_cont_dir_sonar_esq();
+    /*  ><><><><><><><><><><><><><><><><><><><><><>< */
+    if (em_pista_fim_contornar == 0)  //+V+V+V
+    {
+      em_frente_30cm_obst_cont_dir_sonar_esq();
+//      rodar_1_4_esq();
+    }
+  }  
+  digitalWrite(StartLed,LOW);
+//  retomar_pista_a_direita();
 }
 
